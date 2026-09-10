@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.rekon.ServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-10T16:11:18.735Z" hostname="REETU-PC" time="0.668">
+  <properties/>
+  <testcase name="test root endpoint" classname="com.rekon.ServerTest" time="0.665"/>
+  <system-out><![CDATA[2026-09-10 19:11:19.301 [DefaultDispatcher-worker-1 @call-context#3] INFO  io.ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-10 19:11:19.342 [DefaultDispatcher-worker-1 @call-context#3] INFO  io.ktor.test - Application started in 0.056 seconds.
+2026-09-10 19:11:19.344 [DefaultDispatcher-worker-2 @coroutine#5] INFO  io.ktor.test - Responding at http://localhost:80
+2026-09-10 19:11:19.344 [DefaultDispatcher-worker-2 @coroutine#5] INFO  io.ktor.test - Responding at https://localhost:443
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
