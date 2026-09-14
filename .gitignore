@@ -44,6 +44,6 @@ out/
 .DS_Store
 Thumbs.db
 
-### Secrets (adjust to whatever pattern you land on) ###
+### Secrets ###
 .env
 application-local.conf

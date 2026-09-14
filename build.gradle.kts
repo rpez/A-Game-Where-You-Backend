@@ -18,6 +18,8 @@ dependencies {
     implementation(ktorLibs.server.core)
     implementation(ktorLibs.server.netty)
     implementation(libs.logback.classic)
+    implementation(ktorLibs.server.statusPages)
+    implementation("io.ktor:ktor-server-cors:3.5.2")
 
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
