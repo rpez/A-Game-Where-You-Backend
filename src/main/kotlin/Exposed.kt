@@ -5,8 +5,8 @@ import org.jetbrains.exposed.v1.jdbc.Database
 
 suspend fun Application.configureExposed() {
     Database.connect(
-        "jdbc:postgresql://localhost:5432/agamewhereyou",
-        user = "devuser",
-        password = "devpass"
+        url = environment.config.property("ktor.database.url").getString(),
+        user = environment.config.property("ktor.database.user").getString(),
+        password = environment.config.property("ktor.database.password").getString()
     )
 }

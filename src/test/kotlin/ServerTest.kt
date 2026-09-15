@@ -1,5 +1,6 @@
 package com.rekon
 
+import com.rekon.model.CreateTaskRequest
 import com.rekon.model.Task
 import com.rekon.model.TaskRepository
 import com.rekon.model.TaskType
@@ -92,7 +93,7 @@ class ServerTest {
             }
         }
 
-        val task = Task(getNewUuid(), TaskType.SingleTarget, "Go to the beach", "user")
+        val task = CreateTaskRequest(TaskType.SingleTarget, "Go to the beach")
         val response1 = client.post("/tasks") {
             header(
                 HttpHeaders.ContentType,
