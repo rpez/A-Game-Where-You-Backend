@@ -1,6 +1,7 @@
 package com.rekon.model
 
 import kotlinx.serialization.Serializable
+import kotlin.uuid.Uuid
 
 enum class TaskType {
     SingleTarget,
@@ -14,9 +15,13 @@ enum class TaskType {
 }
 
 @Serializable
-data class Task(val type: TaskType,
-                val displayName: String = "",
-                val description: String = "",
-                val id: String = "",
-                val creator: String = "",
+data class CreateTaskRequest(val type: TaskType,
+                             val description: String
+)
+
+@Serializable
+data class Task(val id: Uuid,
+                val type: TaskType,
+                val description: String,
+                val creator: String,
 )

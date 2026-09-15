@@ -1,8 +1,10 @@
 package com.rekon
 
+import com.rekon.model.CreateTaskRequest
 import com.rekon.model.TaskType
 import com.rekon.model.Task
 import com.rekon.model.TaskRepository
+import com.rekon.util.getNewUuid
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.json.*
@@ -13,6 +15,8 @@ import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.UUID
+import kotlin.uuid.Uuid
 
 suspend fun Application.configureSerialization() {
     val repository = dependencies.resolve<TaskRepository>()
@@ -23,19 +27,24 @@ suspend fun Application.configureSerialization() {
     routing {
         route("/tasks") {
             get {
-                println("GET TASKS")
                 val tasks = repository.allTasks()
                 println(tasks)
                 call.respond(tasks)
             }
 
             get("/byId/{id}") {
-                val id = call.parameters["id"]
+                val id: String? = call.parameters["id"]
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
                 }
-                val task = repository.taskById(id)
+                val uuid: Uuid = try {
+                    Uuid.parse(id)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val task = repository.taskById(uuid)
                 if (task == null) {
                     call.respond(HttpStatusCode.NotFound)
                     return@get
@@ -44,7 +53,7 @@ suspend fun Application.configureSerialization() {
             }
 
             get("/byType/{type}") {
-                val typeAsText = call.parameters["type"]
+                val typeAsText: String? = call.parameters["type"]
                 if (typeAsText == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
@@ -65,8 +74,14 @@ suspend fun Application.configureSerialization() {
 
             post {
                 try {
-                    val task = call.receive<Task>()
-                    repository.addTask(task)
+                    val taskRequest: CreateTaskRequest = call.receive<CreateTaskRequest>()
+                    repository.addTask(
+                        Task(getNewUuid(),
+                            taskRequest.type,
+                            taskRequest.description,
+                            "test-user"
+                        )
+                    )
                     call.respond(HttpStatusCode.NoContent)
                 } catch (ex: IllegalStateException) {
                     call.respond(HttpStatusCode.BadRequest)
@@ -76,12 +91,18 @@ suspend fun Application.configureSerialization() {
             }
 
             delete("/{id}") {
-                val id = call.parameters["id"]
+                val id: String? = call.parameters["id"]
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@delete
                 }
-                if (repository.deleteTask(id)) {
+                val uuid: Uuid = try {
+                    Uuid.parse(id)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@delete
+                }
+                if (repository.deleteTask(uuid)) {
                     call.respond(HttpStatusCode.NoContent)
                 } else {
                     call.respond(HttpStatusCode.NotFound)

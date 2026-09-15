@@ -39,10 +39,7 @@
         function buildTaskFromForm() {
             return {
                 type: getTaskFormValue("newTaskType"),
-                displayName: getTaskFormValue("newTaskType"),
-                description: getTaskFormValue("newTaskDescription"),
-                id: getTaskFormValue("newTaskId"),
-                creator: "",
+                description: getTaskFormValue("newTaskDescription")
             }
         }
 
@@ -182,8 +179,6 @@
 </form>
 <form name="addTaskForm" action="javascript:addNewTask()">
     <span>Create new task with</span>
-    <label for="newTaskId">name</label>
-    <input type="text" id="newTaskId" name="newTaskId" size="10">
     <label for="newTaskDescription">description</label>
     <input type="text" id="newTaskDescription" name="newTaskDescription" size="20">
     <label for="newTaskType">type</label>

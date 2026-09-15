@@ -1,9 +1,9 @@
 package com.rekon
 
-import com.rekon.model.FakeTaskRepository
 import com.rekon.model.Task
 import com.rekon.model.TaskRepository
 import com.rekon.model.TaskType
+import com.rekon.util.getNewUuid
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
@@ -56,9 +56,9 @@ class ServerTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val expectedTaskIds = listOf("1", "4")
-        val actualTaskIds = results.map(Task::id)
-        assertContentEquals(expectedTaskIds, actualTaskIds)
+        val expectedTaskDescriptions = listOf("Do stuff", "Exist")
+        val actualTaskDescriptions = results.map(Task::description)
+        assertContentEquals(expectedTaskDescriptions, actualTaskDescriptions)
     }
 
     @Test
@@ -92,7 +92,7 @@ class ServerTest {
             }
         }
 
-        val task = Task(TaskType.SingleTarget,"Swim", "Go to the beach", "1", "user")
+        val task = Task(getNewUuid(), TaskType.SingleTarget, "Go to the beach", "user")
         val response1 = client.post("/tasks") {
             header(
                 HttpHeaders.ContentType,
@@ -106,10 +106,10 @@ class ServerTest {
         val response2 = client.get("/tasks")
         assertEquals(HttpStatusCode.OK, response2.status)
 
-        val taskIds = response2
+        val taskDescriptions = response2
             .body<List<Task>>()
-            .map { it.id }
+            .map { it.description }
 
-        assertContains(taskIds, "1")
+        assertContains(taskDescriptions, "Go to the beach")
     }
 }
