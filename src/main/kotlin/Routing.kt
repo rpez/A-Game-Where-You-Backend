@@ -2,6 +2,7 @@ package com.rekon
 
 import io.ktor.http.HttpHeaders
 import io.ktor.server.application.*
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.plugins.cors.routing.*
@@ -9,35 +10,26 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.StatusPages
 
 fun Application.configureRouting() {
+    // Configure environment
     val environment: String = (System.getenv("ENVIRONMENT") ?: "development").trim()
-    println("[$environment]")
     if (environment == "development") {
-        println(environment)
         install(CORS)
         {
             val host: String? = System.getenv("FRONTEND_DEV")?.trim()
             if (host != null)
             {
-                println("[$host]")
                 allowHost(host, listOf("http"))
                 allowHeader(HttpHeaders.ContentType)
             }
         }
     }
-    install(StatusPages) {
-        exception<IllegalStateException> { call, cause ->
-            call.respondText("App in illegal state: ${cause.message}")
-        }
-    }
+
+    // Configure routing
     routing {
         get("/") {
-            call.respondText("Hello, World!")
+            call.respondText("Welcome to a Game Where You _____!")
         }
-        get("/error-test") {
-            throw IllegalStateException("Test Error")
-        }
-        get("health") {
-            call.respondText("Ok")
-        }
+        // Static plugin for testing at `/static/index.html`
+        staticResources("/static", "static")
     }
 }

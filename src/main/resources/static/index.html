@@ -1,0 +1,220 @@
+<html>
+<head>
+    <title>A Simple SPA For Tasks</title>
+    <script type="application/javascript">
+        function displayAllTasks() {
+            clearTasksTable();
+            fetchAllTasks().then(displayTasks)
+        }
+
+        function displayTasksWithType() {
+            clearTasksTable();
+            const type = readTaskType();
+            fetchTasksWithType(type).then(displayTasks)
+        }
+
+        function displayTask(id) {
+            fetchTaskWithId(id).then(t =>
+                taskDisplay().innerHTML
+                    = `${t.type} type task ${t.id} with description "${t.description}"`
+            )
+        }
+
+        function deleteTask(id) {
+            deleteTaskWithId(id).then(() => {
+                clearTaskDisplay();
+                displayAllTasks();
+            })
+        }
+
+        function deleteTaskWithId(id) {
+            return sendDELETE(`/tasks/${id}`)
+        }
+
+        function addNewTask() {
+            const task = buildTaskFromForm();
+            sendPOST("/tasks", task).then(displayAllTasks);
+        }
+
+        function buildTaskFromForm() {
+            return {
+                type: getTaskFormValue("newTaskType"),
+                displayName: getTaskFormValue("newTaskType"),
+                description: getTaskFormValue("newTaskDescription"),
+                id: getTaskFormValue("newTaskId"),
+                creator: "",
+            }
+        }
+
+        function getTaskFormValue(controlId) {
+            return document.addTaskForm[controlId].value;
+        }
+
+        function taskDisplay() {
+            return document.getElementById("currentTaskDisplay");
+        }
+
+        function readTaskType() {
+            return document.typeForm.type.value
+        }
+
+        function fetchTasksWithType(type) {
+            return sendGET(`/tasks/byType/${type}`);
+        }
+
+        function fetchTaskWithId(id) {
+            return sendGET(`/tasks/byId/${id}`);
+        }
+
+        function fetchAllTasks() {
+            return sendGET("/tasks")
+        }
+
+        function sendGET(url) {
+            return fetch(
+                url,
+                {headers: {'Accept': 'application/json'}}
+            ).then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                return [];
+            });
+        }
+
+        function sendPOST(url, data) {
+            return fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+        }
+
+        function sendDELETE(url) {
+            return fetch(url, {
+                method: "DELETE"
+            });
+        }
+
+        function tasksTable() {
+            return document.getElementById("tasksTableBody");
+        }
+
+        function clearTasksTable() {
+            tasksTable().innerHTML = "";
+        }
+
+        function clearTaskDisplay() {
+            taskDisplay().innerText = "None";
+        }
+
+        function displayTasks(tasks) {
+            const tasksTableBody = tasksTable()
+            tasks.forEach(task => {
+                const newRow = taskRow(task);
+                tasksTableBody.appendChild(newRow);
+            });
+        }
+
+        function taskRow(task) {
+            return tr([
+                td(task.id),
+                td(task.type),
+                td(viewLink(task.id)),
+                td(deleteLink(task.id)),
+            ]);
+        }
+
+        function tr(children) {
+            const node = document.createElement("tr");
+            children.forEach(child => node.appendChild(child));
+            return node;
+        }
+
+        function td(content) {
+            const node = document.createElement("td");
+            if (content instanceof Element) {
+                node.appendChild(content)
+            } else {
+                node.appendChild(document.createTextNode(content));
+            }
+            return node;
+        }
+
+        function viewLink(taskId) {
+            const node = document.createElement("a");
+            node.setAttribute(
+                "href", `javascript:displayTask("${taskId}")`
+            )
+            node.appendChild(document.createTextNode("view"));
+            return node;
+        }
+
+        function deleteLink(taskId) {
+            const node = document.createElement("a");
+            node.setAttribute(
+                "href", `javascript:deleteTask("${taskId}")`
+            )
+            node.appendChild(document.createTextNode("delete"));
+            return node;
+        }
+    </script>
+</head>
+<body onload="displayAllTasks()">
+<h1>Task Manager Client</h1>
+<form action="javascript:displayAllTasks()">
+    <span>View all the tasks</span>
+    <input type="submit" value="Go">
+</form>
+<form name="typeForm" action="javascript:displayTasksWithType()">
+    <span>View tasks with type</span>
+    <select name="type">
+        <option name="SingleTarget">SingleTarget</option>
+        <option name="MultiTarget">MultiTarget</option>
+        <option name="Opponents">Opponents</option>
+        <option name="Everyone">Everyone</option>
+        <option name="Modifier">Modifier</option>
+        <option name="Permanent">Permanent</option>
+        <option name="Special">Special</option>
+        <option name="Other">Other</option>
+    </select>
+    <input type="submit" value="Go">
+</form>
+<form name="addTaskForm" action="javascript:addNewTask()">
+    <span>Create new task with</span>
+    <label for="newTaskId">name</label>
+    <input type="text" id="newTaskId" name="newTaskId" size="10">
+    <label for="newTaskDescription">description</label>
+    <input type="text" id="newTaskDescription" name="newTaskDescription" size="20">
+    <label for="newTaskType">type</label>
+    <select id="newTaskType" name="newTaskType">
+        <option name="SingleTarget">SingleTarget</option>
+        <option name="MultiTarget">MultiTarget</option>
+        <option name="Opponents">Opponents</option>
+        <option name="Everyone">Everyone</option>
+        <option name="Modifier">Modifier</option>
+        <option name="Permanent">Permanent</option>
+        <option name="Special">Special</option>
+        <option name="Other">Other</option>
+    </select>
+    <input type="submit" value="Go">
+</form>
+<hr>
+<div>
+    Current task is <em id="currentTaskDisplay">None</em>
+</div>
+<hr>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Type</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="tasksTableBody">
+    </tbody>
+</table>
+</body>
+</html>
